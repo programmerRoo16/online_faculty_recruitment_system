@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.roo.daoImpl.AplliedVacancyDaoImpl;
+import com.roo.feature.service.EmailNotificationService;
+import com.roo.feature.workflow.InterviewStage;
 import com.roo.pojo.AppliedVacancy;
 import com.roo.pojo.Candidate;
 import com.roo.pojo.Recruiter;
@@ -23,6 +25,9 @@ import com.roo.pojo.Vacancy;
 public class AplliedVacancyController {
     @Autowired
 	private AplliedVacancyDaoImpl aplliedVacancyDaoImpl;
+
+	@Autowired
+	private EmailNotificationService emailNotificationService;
       
     
     
@@ -34,7 +39,8 @@ public class AplliedVacancyController {
 		Vacancy vacancy=aplliedVacancyDaoImpl.getVacancy(vId);
 		Recruiter recruiter=aplliedVacancyDaoImpl.getRecruiter(vacancy.getEmail());
 		
-		AppliedVacancy appliedVacancy=new AppliedVacancy(vacancy, candidate, recruiter, "Pending");
+		AppliedVacancy appliedVacancy=new AppliedVacancy(vacancy, candidate, recruiter, "Applied");
+		appliedVacancy.setInterviewStage(InterviewStage.APPLIED.name());
 		if(aplliedVacancyDaoImpl.saveAplliedVacancy(appliedVacancy))
 		{  	return "redirect:/seeAllVacancies";
         } else {
@@ -66,6 +72,11 @@ public class AplliedVacancyController {
 			                         @RequestParam("status")String status,Model m) {
 	    AppliedVacancy appliedVacancy=aplliedVacancyDaoImpl.findById(id);
 	    appliedVacancy.setStatusByRecruiter(status);
+	    InterviewStage stage = InterviewStage.fromRecruiterStatus(status);
+	    appliedVacancy.setInterviewStage(stage.name());
+	    if (stage != InterviewStage.APPLIED && stage != InterviewStage.REJECTED) {
+	    	emailNotificationService.sendInterviewNotification(appliedVacancy.getCandidate().getEmail(), stage.name(), new java.util.Date());
+	    }
 	    if(aplliedVacancyDaoImpl.updateStatus(appliedVacancy)) {
 	    	Recruiter recruiter=(Recruiter)session.getAttribute("recruiter");
 			List<AppliedVacancy> list=aplliedVacancyDaoImpl.viewCandidate(recruiter);
