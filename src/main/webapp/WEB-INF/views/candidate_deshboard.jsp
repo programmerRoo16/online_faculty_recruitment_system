@@ -383,6 +383,63 @@
             </div>
         </div>
 
+        <div class="section-title">
+            <span>AI Profile & API Calculator</span>
+        </div>
+        <div class="table-container" style="padding:20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:16px;">
+                <div><strong>Parsed Email:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedEmail()!=null ? candidate.getParsedEmail() : "Not extracted" %></span></div>
+                <div><strong>Parsed Phone:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedPhone()!=null ? candidate.getParsedPhone() : "Not extracted" %></span></div>
+                <div><strong>Parsed Skills:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedSkills()!=null ? candidate.getParsedSkills() : "Not extracted" %></span></div>
+                <div><strong>Current API Score:</strong><br><span id="apiScoreValue" style="color:#0f766e; font-weight:700;"><%= candidate != null ? candidate.getApiScore() : 0 %></span></div>
+            </div>
+
+            <% if(candidate != null) { %>
+            <form id="apiScoreForm" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; align-items:end;">
+                <input type="number" min="0" name="journalsScopus" placeholder="Scopus Journals" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="journalsUgc" placeholder="UGC Journals" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="books" placeholder="Books" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="conferences" placeholder="Conferences" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="patents" placeholder="Patents" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <button type="submit" class="btn-apply">Calculate API</button>
+            </form>
+            <small id="apiScoreMsg" style="display:block; margin-top:10px; color:#475569;"></small>
+            <script>
+            (function() {
+                var form = document.getElementById('apiScoreForm');
+                if (!form) return;
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var data = {
+                        journalsScopus: Number(form.journalsScopus.value || 0),
+                        journalsUgc: Number(form.journalsUgc.value || 0),
+                        books: Number(form.books.value || 0),
+                        conferences: Number(form.conferences.value || 0),
+                        patents: Number(form.patents.value || 0)
+                    };
+                    fetch('api/recruitment/candidate/<%=candidate.getEmail()%>/api-score', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    })
+                    .then(function(r){ return r.json(); })
+                    .then(function(res){
+                        if (res && typeof res.apiScore !== 'undefined') {
+                            document.getElementById('apiScoreValue').textContent = res.apiScore;
+                            document.getElementById('apiScoreMsg').textContent = 'API score updated successfully.';
+                        } else {
+                            document.getElementById('apiScoreMsg').textContent = 'Unable to calculate API score.';
+                        }
+                    })
+                    .catch(function(){
+                        document.getElementById('apiScoreMsg').textContent = 'Request failed. Please try again.';
+                    });
+                });
+            })();
+            </script>
+            <% } %>
+        </div>
+
         <!-- TABLE 1: RECENT APPLICATIONS -->
         <div class="section-title">
             <span>Recent Applications</span>
@@ -406,11 +463,11 @@
                         int limit = Math.min(appliedCount, 3);
                         for(int i=0; i<limit; i++) {
                             AppliedVacancy av = appliedList.get(i);
-                            String status = av.getStatusByRecruiter();
+                            String stage = av.getInterviewStage();
                             String badgeClass = "status-pending";
-                            String label = "Pending";
-                            if("Shortlisted".equalsIgnoreCase(status)) { badgeClass = "status-shortlisted"; label = "Shortlisted"; }
-                            else if("Rejected".equalsIgnoreCase(status)) { badgeClass = "status-rejected"; label = "Not Selected"; }
+                            String label = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
+                            if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { badgeClass = "status-shortlisted"; }
+                            else if("REJECTED".equalsIgnoreCase(stage)) { badgeClass = "status-rejected"; }
                     %>
                     <tr>
                         <td style="font-weight: 500;"><%= av.getVacancy().getPost() %></td>

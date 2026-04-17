@@ -230,8 +230,11 @@
                             <th>Applied For</th>
                             <th>Qualification</th>
                             <th>Experience</th>
+                            <th>API Score</th>
+                            <th>Parsed Skills</th>
                             <th>Contact Info</th>
                             <th>Location</th>
+                            <th>Stage</th>
                             <th>Resume</th>
                             <th>Action</th>
                         </tr>
@@ -246,7 +249,10 @@
                                 
                                 // Safe null check for status
                                 String status = appliedVacancy.getStatusByRecruiter();
-                                boolean isSelected = status != null && !status.equals("null") && !status.isEmpty();
+                                String interviewStage = appliedVacancy.getInterviewStage();
+                                if(interviewStage == null || interviewStage.trim().isEmpty()) {
+                                    interviewStage = "APPLIED";
+                                }
                         %>
                         <tr>
                             <td>
@@ -262,6 +268,8 @@
                             </td>
                             <td><%=candidate.getQualification()%></td>
                             <td><%=candidate.getExperience()%></td>
+                            <td><%=candidate.getApiScore()%></td>
+                            <td><%=candidate.getParsedSkills() == null ? "N/A" : candidate.getParsedSkills()%></td>
                             <td>
                                 <div class="user-cell">
                                     <span class="user-meta"><i class="fa-solid fa-envelope"></i> <%=candidate.getEmail()%></span>
@@ -269,7 +277,7 @@
                                 </div>
                             </td>
                             <td><%=candidate.getAddress()%></td>
-                            
+                            <td><span class="user-meta" style="font-weight:600;"><%=interviewStage.replace("_", " ")%></span></td>
                             <td>
                                 <% if(candidate.getFileData() != null) { %>
                                     <a href="view_resume?email=<%=candidate.getEmail()%>" target="_blank" class="btn-resume">
@@ -281,19 +289,19 @@
                             </td>
                             
                             <td>
-                                <form action="selectCandidate" method="post" style="margin:0;">
+                                <form action="selectCandidate" method="post" style="margin:0; display:flex; gap:8px; align-items:center;">
                                     <input type="hidden" name="id" value="<%=appliedVacancy.getId()%>">
-                                    <input type="hidden" name="status" value="Shortlisted">
-                                    
-                                    <% if(!isSelected) { %>
-                                        <button type="submit" class="btn-select">
-                                            <i class="fa-solid fa-check"></i> Select
-                                        </button>
-                                    <% } else { %>                        
-                                        <button type="button" class="btn-disabled" disabled>
-                                            <i class="fa-solid fa-check-double"></i> Selected
-                                        </button>
-                                    <% } %>
+                                    <select name="status" style="padding:7px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
+                                        <option value="Applied" <%= "APPLIED".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Applied</option>
+                                        <option value="Written Test" <%= "WRITTEN_TEST".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Written Test</option>
+                                        <option value="Interview" <%= "INTERVIEW".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Interview</option>
+                                        <option value="HR Round" <%= "HR_ROUND".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>HR Round</option>
+                                        <option value="Offered" <%= "OFFERED".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Offered</option>
+                                        <option value="Rejected" <%= "REJECTED".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Rejected</option>
+                                    </select>
+                                    <button type="submit" class="btn-select">
+                                        <i class="fa-solid fa-floppy-disk"></i> Update
+                                    </button>
                                 </form>
                             </td>
                         </tr> 
@@ -302,7 +310,7 @@
                         } else { 
                         %>
                         <tr>
-                            <td colspan="8" class="no-data">
+                            <td colspan="11" class="no-data">
                                 No candidates have applied for your vacancies yet.
                             </td>
                         </tr>
