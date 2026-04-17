@@ -224,7 +224,8 @@
                         <th>Application Details</th>
                         <th>Job Role</th>
                         <th>Recruiter Information</th>
-                        <th>Current Status</th>
+                        <th>Current Stage</th>
+                        <th>Merit Score</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -232,18 +233,18 @@
                         AppliedVacancy avacancy = list.get(i);
                         
                         // --- Logic for Badge Colors ---
-                        String status = avacancy.getStatusByRecruiter();
+                        String status = avacancy.getInterviewStage();
                         String badgeClass = "badge-pending"; // Default Grey
                         String iconClass = "fa-clock";
                         
                         if(status == null || status.trim().isEmpty()) {
-                            status = "Pending";
+                            status = "APPLIED";
                         }
                         
-                        if("Shortlisted".equalsIgnoreCase(status)) {
+                        if("OFFERED".equalsIgnoreCase(status) || "SHORTLISTED".equalsIgnoreCase(status)) {
                             badgeClass = "badge-success";
                             iconClass = "fa-check-circle";
-                        } else if ("Rejected".equalsIgnoreCase(status)) {
+                        } else if ("REJECTED".equalsIgnoreCase(status)) {
                             badgeClass = "badge-danger";
                             iconClass = "fa-times-circle";
                         }
@@ -265,9 +266,10 @@
                         </td>
                         <td>
                             <span class="status-badge <%=badgeClass%>">
-                                <i class="fa-solid <%=iconClass%>"></i> <%=status%>
+                                <i class="fa-solid <%=iconClass%>"></i> <%=status.replace("_", " ")%>
                             </span>
                         </td>
+                        <td><%=String.format("%.2f", avacancy.getShortlistScore())%></td>
                     </tr> 
                     <%} %>
                 </tbody>
