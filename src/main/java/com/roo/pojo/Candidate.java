@@ -21,9 +21,12 @@ public class Candidate {
 	@Lob
 	private byte[] fileData;
 	private String fileName;
+	private String parsedEmail;
+	private String parsedPhone;
+	private String parsedSkills;
+	private double apiScore;
 	public Candidate() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	public Candidate(String fname, String lname, String email, String password, String gender, String date,
 			String address, String contact, String qualification, String experience, boolean verified,byte[] fileData, String fileName) {
@@ -40,6 +43,7 @@ public class Candidate {
 		this.experience = experience;
 		this.verified = verified;
 		this.fileData=fileData;
+		this.fileName = fileName;
 	}
 	public String getFname() {
 		return fname;
@@ -119,5 +123,42 @@ public class Candidate {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-	
+	public String getParsedEmail() {
+		return parsedEmail;
+	}
+	public void setParsedEmail(String parsedEmail) {
+		this.parsedEmail = parsedEmail;
+	}
+	public String getParsedPhone() {
+		return parsedPhone;
+	}
+	public void setParsedPhone(String parsedPhone) {
+		this.parsedPhone = parsedPhone;
+	}
+	public String getParsedSkills() {
+		return parsedSkills;
+	}
+	public void setParsedSkills(String parsedSkills) {
+		this.parsedSkills = parsedSkills;
+	}
+	public double getApiScore() {
+		return apiScore;
+	}
+	public void setApiScore(double apiScore) {
+		this.apiScore = apiScore;
+	}
+	public double getExperienceInYears() {
+		if (experience == null) {
+			return 0.0;
+		}
+		String numericPart = experience.replaceAll("[^0-9.]", "");
+		if (numericPart.isEmpty()) {
+			return 0.0;
+		}
+		try {
+			return Double.parseDouble(numericPart);
+		} catch (NumberFormatException ex) {
+			return 0.0;
+		}
+	}
 }
