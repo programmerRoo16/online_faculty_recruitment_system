@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.roo.daoImpl.CandidateDaoImpl;
+import com.roo.feature.dto.ResumeData;
+import com.roo.feature.service.ResumeParsingService;
 import com.roo.pojo.AppliedVacancy;
 import com.roo.pojo.Candidate;
 import com.roo.pojo.Vacancy;
@@ -27,6 +29,9 @@ public class CandidateController {
 
 @Autowired
 private CandidateDaoImpl candidateDaoImpl;	
+
+@Autowired
+private ResumeParsingService resumeParsingService;
 
 @RequestMapping("/")
 public String getIndex() {
@@ -91,8 +96,12 @@ public String register(@RequestParam("fname") String fname,
        				   @RequestParam("qualification") String qualification,
        				   @RequestParam("experience") String exprience,Model model,@RequestParam("resume")MultipartFile file)throws IOException{
 	 byte[] fileData=file.getBytes();
-	 String fileName=file.getName();
+	 String fileName=file.getOriginalFilename();
 	Candidate candidate=new Candidate(fname, lname, email, password, gender, date, address, contact, qualification, exprience, false,fileData,fileName);
+	ResumeData resumeData = resumeParsingService.parse(fileData);
+	candidate.setParsedEmail(resumeData.getExtractedEmail());
+	candidate.setParsedPhone(resumeData.getExtractedPhone());
+	candidate.setParsedSkills(String.join(",", resumeData.getExtractedSkills()));
 	if(candidateDaoImpl.registerCandidate(candidate)) {
 		model.addAttribute("candidate", candidate);
 		return"loginCandidate";
@@ -147,6 +156,10 @@ public String updateCandidate(@RequestParam("fname") String fname,
         finalFileName = existingCandidate.getFileName(); 
     }
 	Candidate candidate=new Candidate(fname, lname, email, password, gender, date, address, contact, qualification, exprience, false,finalFileData,finalFileName);
+	ResumeData resumeData = resumeParsingService.parse(finalFileData);
+	candidate.setParsedEmail(resumeData.getExtractedEmail());
+	candidate.setParsedPhone(resumeData.getExtractedPhone());
+	candidate.setParsedSkills(String.join(",", resumeData.getExtractedSkills()));
 	if(candidateDaoImpl.updateCandidate(candidate)) {
 		model.addAttribute("msg","Profile Updated Successfully");
 		return"redirect:/candidate_deshboard";

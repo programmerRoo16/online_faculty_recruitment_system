@@ -5,8 +5,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-
 import javax.persistence.ManyToOne;
+
+import com.roo.feature.workflow.InterviewStage;
 
 @Entity
 public class AppliedVacancy {
@@ -24,9 +25,10 @@ private Candidate candidate;
 private Recruiter recruiter;
 
 private String statusByRecruiter;
+private String interviewStage;
+private double shortlistScore;
 public AppliedVacancy() {
 	super();
-	// TODO Auto-generated constructor stub
 }
 
 public AppliedVacancy(int id, Vacancy vacancy, Candidate candidate, Recruiter recruiter, String statusByRecruiter) {
@@ -36,6 +38,7 @@ public AppliedVacancy(int id, Vacancy vacancy, Candidate candidate, Recruiter re
 	this.candidate = candidate;
 	this.recruiter = recruiter;
 	this.statusByRecruiter = statusByRecruiter;
+	this.interviewStage = InterviewStage.APPLIED.name();
 }
 
 public AppliedVacancy(Vacancy vacancy, Candidate candidate, Recruiter recruiter,
@@ -45,6 +48,7 @@ public AppliedVacancy(Vacancy vacancy, Candidate candidate, Recruiter recruiter,
 	this.candidate = candidate;
 	this.recruiter = recruiter;
 	this.statusByRecruiter = statusByRecruiter;
+	this.interviewStage = InterviewStage.APPLIED.name();
 }
 public int getId() {
 	return id;
@@ -78,5 +82,20 @@ public void setStatusByRecruiter(String statusByRecruiter) {
 	this.statusByRecruiter = statusByRecruiter;
 }
 
+public String getInterviewStage() {
+	return interviewStage;
+}
+
+public void setInterviewStage(String interviewStage) {
+	this.interviewStage = interviewStage;
+}
+
+public double getShortlistScore() {
+	return shortlistScore;
+}
+
+public void setShortlistScore(double shortlistScore) {
+	this.shortlistScore = shortlistScore;
+}
 
 }

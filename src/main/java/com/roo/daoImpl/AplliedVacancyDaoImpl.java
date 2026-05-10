@@ -84,6 +84,16 @@ public class AplliedVacancyDaoImpl implements AplliedVacancyDao{
 	    return true;
 	}
 	
+	@Transactional
+	public List<AppliedVacancy> findByVacancyId(int vacancyId) {
+		Session session = factory.getCurrentSession();
+		Query<AppliedVacancy> query = session.createQuery(
+				"from AppliedVacancy a where a.vacancy.vacancyId=:vacancyId",
+				AppliedVacancy.class);
+		query.setParameter("vacancyId", vacancyId);
+		return query.list();
+	}
+
 	
 
 	@Override

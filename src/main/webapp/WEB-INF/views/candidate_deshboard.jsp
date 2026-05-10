@@ -347,12 +347,16 @@
     <!-- MAIN CONTENT -->
     <div class="main-content">
         
-        <div class="top-bar">
+        <div class="hero-panel">
             <div class="user-welcome">
                 <h2>Hello, <%= fullName %>!</h2>
-                <p>Welcome back to your career dashboard.</p>
+                <p>Your AI-assisted recruitment workspace is ready. Review resume insights, calculate your API score, track each application stage, and apply for matching faculty vacancies faster.</p>
             </div>
-            <div class="profile-bubble"><%= initials %></div>
+            <div class="hero-actions">
+                <a href="seeAllVacancies" class="hero-btn primary"><i class="fa-solid fa-magnifying-glass"></i> Find Jobs</a>
+                <a href="updateProfile" class="hero-btn"><i class="fa-solid fa-file-arrow-up"></i> Update Resume</a>
+                <div class="profile-bubble"><%= initials %></div>
+            </div>
         </div>
 
         <%
@@ -383,6 +387,63 @@
             </div>
         </div>
 
+        <div class="section-title">
+            <span>AI Profile & API Calculator</span>
+        </div>
+        <div class="table-container ai-lab">
+            <div class="insight-grid">
+                <div class="insight-card"><label>Resume Email</label><span><%= candidate != null && candidate.getParsedEmail()!=null ? candidate.getParsedEmail() : "Not extracted" %></span></div>
+                <div class="insight-card"><label>Resume Phone</label><span><%= candidate != null && candidate.getParsedPhone()!=null ? candidate.getParsedPhone() : "Not extracted" %></span></div>
+                <div class="insight-card"><label>Detected Skills</label><span><%= candidate != null && candidate.getParsedSkills()!=null ? candidate.getParsedSkills() : "Upload a readable PDF resume to auto-fill skills" %></span></div>
+                <div class="insight-card"><label>API Score</label><span id="apiScoreValue" class="api-score-number"><%= candidate != null ? candidate.getApiScore() : 0 %></span></div>
+            </div>
+
+            <% if(candidate != null) { %>
+            <form id="apiScoreForm" class="api-form-grid">
+                <input class="api-input" type="number" min="0" name="journalsScopus" placeholder="Scopus Journals">
+                <input class="api-input" type="number" min="0" name="journalsUgc" placeholder="UGC Journals">
+                <input class="api-input" type="number" min="0" name="books" placeholder="Books">
+                <input class="api-input" type="number" min="0" name="conferences" placeholder="Conferences">
+                <input class="api-input" type="number" min="0" name="patents" placeholder="Patents">
+                <button type="submit" class="btn-apply"><i class="fa-solid fa-calculator"></i> Calculate API</button>
+            </form>
+            <small id="apiScoreMsg" style="display:block; margin-top:10px; color:#475569;"></small>
+            <script>
+            (function() {
+                var form = document.getElementById('apiScoreForm');
+                if (!form) return;
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var data = {
+                        journalsScopus: Number(form.journalsScopus.value || 0),
+                        journalsUgc: Number(form.journalsUgc.value || 0),
+                        books: Number(form.books.value || 0),
+                        conferences: Number(form.conferences.value || 0),
+                        patents: Number(form.patents.value || 0)
+                    };
+                    fetch('api/recruitment/candidate/<%=candidate.getEmail()%>/api-score', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(data)
+                    })
+                    .then(function(r){ return r.json(); })
+                    .then(function(res){
+                        if (res && typeof res.apiScore !== 'undefined') {
+                            document.getElementById('apiScoreValue').textContent = res.apiScore;
+                            document.getElementById('apiScoreMsg').textContent = 'API score updated successfully.';
+                        } else {
+                            document.getElementById('apiScoreMsg').textContent = 'Unable to calculate API score.';
+                        }
+                    })
+                    .catch(function(){
+                        document.getElementById('apiScoreMsg').textContent = 'Request failed. Please try again.';
+                    });
+                });
+            })();
+            </script>
+            <% } %>
+        </div>
+
         <!-- TABLE 1: RECENT APPLICATIONS -->
         <div class="section-title">
             <span>Recent Applications</span>
@@ -406,17 +467,18 @@
                         int limit = Math.min(appliedCount, 3);
                         for(int i=0; i<limit; i++) {
                             AppliedVacancy av = appliedList.get(i);
-                            String status = av.getStatusByRecruiter();
-                            String badgeClass = "status-pending";
-                            String label = "Pending";
-                            if("Shortlisted".equalsIgnoreCase(status)) { badgeClass = "status-shortlisted"; label = "Shortlisted"; }
-                            else if("Rejected".equalsIgnoreCase(status)) { badgeClass = "status-rejected"; label = "Not Selected"; }
+                            String stage = av.getInterviewStage();
+                            String applicationStageBadgeClass = "stage-badge stage-applied";
+                            String applicationStageLabel = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
+                            if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { applicationStageBadgeClass = "stage-badge stage-offered"; }
+                            else if("REJECTED".equalsIgnoreCase(stage)) { applicationStageBadgeClass = "stage-badge stage-rejected"; }
+                            else if(!"APPLIED".equalsIgnoreCase(stage)) { applicationStageBadgeClass = "stage-badge stage-progress"; }
                     %>
                     <tr>
                         <td style="font-weight: 500;"><%= av.getVacancy().getPost() %></td>
                         <td><%= av.getRecruiter().getName() %></td>
                         <td><%= av.getRecruiter().getEmail() %></td>
-                        <td><span class="status-badge <%= badgeClass %>"><%= label %></span></td>
+                        <td><span class="<%= applicationStageBadgeClass %>"><i class="fa-solid fa-circle-dot"></i> <%= applicationStageLabel %></span></td>
                         <td><a href="viewApplieVacancies" class="btn-view">View Details</a></td>
                     </tr>
                     <% } } else { %>
