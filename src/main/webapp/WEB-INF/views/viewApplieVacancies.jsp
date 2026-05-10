@@ -246,10 +246,18 @@
             <div class="stage-step"><i class="fa-solid fa-user-group"></i> Interview</div>
             <div class="stage-step"><i class="fa-solid fa-handshake"></i> HR Round</div>
             <div class="stage-step"><i class="fa-solid fa-award"></i> Offered</div>
+        
+        <div class="page-header">
+            <div>
+                <h2>My Applications</h2>
+                <p>Track the status of your submitted job applications.</p>
+            </div>
         </div>
 
         <div class="table-container">
             <%
+            List<AppliedVacancy> list = (List<AppliedVacancy>)request.getAttribute("list");
+
             if (list != null && list.size() > 0) {
             %>
             <table>
@@ -304,6 +312,7 @@
                             </span>
                         </td>
                         <td><span class="score-pill"><%=String.format("%.2f", avacancy.getShortlistScore())%></span></td>
+                        <td><%=String.format("%.2f", avacancy.getShortlistScore())%></td>
                     </tr> 
                     <%} %>
                 </tbody>

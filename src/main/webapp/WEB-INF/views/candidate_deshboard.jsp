@@ -357,6 +357,12 @@
                 <a href="updateProfile" class="hero-btn"><i class="fa-solid fa-file-arrow-up"></i> Update Resume</a>
                 <div class="profile-bubble"><%= initials %></div>
             </div>
+        <div class="top-bar">
+            <div class="user-welcome">
+                <h2>Hello, <%= fullName %>!</h2>
+                <p>Welcome back to your career dashboard.</p>
+            </div>
+            <div class="profile-bubble"><%= initials %></div>
         </div>
 
         <%
@@ -406,6 +412,22 @@
                 <input class="api-input" type="number" min="0" name="conferences" placeholder="Conferences">
                 <input class="api-input" type="number" min="0" name="patents" placeholder="Patents">
                 <button type="submit" class="btn-apply"><i class="fa-solid fa-calculator"></i> Calculate API</button>
+        <div class="table-container" style="padding:20px;">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:16px;">
+                <div><strong>Parsed Email:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedEmail()!=null ? candidate.getParsedEmail() : "Not extracted" %></span></div>
+                <div><strong>Parsed Phone:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedPhone()!=null ? candidate.getParsedPhone() : "Not extracted" %></span></div>
+                <div><strong>Parsed Skills:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedSkills()!=null ? candidate.getParsedSkills() : "Not extracted" %></span></div>
+                <div><strong>Current API Score:</strong><br><span id="apiScoreValue" style="color:#0f766e; font-weight:700;"><%= candidate != null ? candidate.getApiScore() : 0 %></span></div>
+            </div>
+
+            <% if(candidate != null) { %>
+            <form id="apiScoreForm" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; align-items:end;">
+                <input type="number" min="0" name="journalsScopus" placeholder="Scopus Journals" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="journalsUgc" placeholder="UGC Journals" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="books" placeholder="Books" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="conferences" placeholder="Conferences" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <input type="number" min="0" name="patents" placeholder="Patents" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px;">
+                <button type="submit" class="btn-apply">Calculate API</button>
             </form>
             <small id="apiScoreMsg" style="display:block; margin-top:10px; color:#475569;"></small>
             <script>
@@ -473,12 +495,17 @@
                             if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-offered"; }
                             else if("REJECTED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-rejected"; }
                             else if(!"APPLIED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-progress"; }
+                            String badgeClass = "status-pending";
+                            String label = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
+                            if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { badgeClass = "status-shortlisted"; }
+                            else if("REJECTED".equalsIgnoreCase(stage)) { badgeClass = "status-rejected"; }
                     %>
                     <tr>
                         <td style="font-weight: 500;"><%= av.getVacancy().getPost() %></td>
                         <td><%= av.getRecruiter().getName() %></td>
                         <td><%= av.getRecruiter().getEmail() %></td>
                         <td><span class="<%= badgeClass %>"><i class="fa-solid fa-circle-dot"></i> <%= label %></span></td>
+                        <td><span class="status-badge <%= badgeClass %>"><%= label %></span></td>
                         <td><a href="viewApplieVacancies" class="btn-view">View Details</a></td>
                     </tr>
                     <% } } else { %>

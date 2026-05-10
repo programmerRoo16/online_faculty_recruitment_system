@@ -259,6 +259,17 @@
             <div class="summary-tile"><label>Active Pipeline</label><strong><%=activeApplicants%></strong></div>
             <div class="summary-tile"><label>Offered</label><strong><%=offeredApplicants%></strong></div>
         </div>
+        <div class="page-header">
+            <div>
+                <h2>Manage Applicants</h2>
+                <p>Review and shortlist candidates who applied to your vacancies.</p>
+            </div>
+        </div>
+
+        <%
+            @SuppressWarnings("unchecked")
+            List<AppliedVacancy> list = (List<AppliedVacancy>)request.getAttribute("list");
+        %>
 
         <div class="table-card">
             <div class="table-responsive">
@@ -309,6 +320,8 @@
                             <td><%=candidate.getExperience()%></td>
                             <td><span class="score-pill"><%=candidate.getApiScore()%></span></td>
                             <td><div class="skills-text"><%=candidate.getParsedSkills() == null ? "N/A" : candidate.getParsedSkills()%></div></td>
+                            <td><%=candidate.getApiScore()%></td>
+                            <td><%=candidate.getParsedSkills() == null ? "N/A" : candidate.getParsedSkills()%></td>
                             <td>
                                 <div class="user-cell">
                                     <span class="user-meta"><i class="fa-solid fa-envelope"></i> <%=candidate.getEmail()%></span>
@@ -317,6 +330,7 @@
                             </td>
                             <td><%=candidate.getAddress()%></td>
                             <td><span class="stage-pill"><i class="fa-solid fa-route"></i> <%=interviewStage.replace("_", " ")%></span></td>
+                            <td><span class="user-meta" style="font-weight:600;"><%=interviewStage.replace("_", " ")%></span></td>
                             <td>
                                 <% if(candidate.getFileData() != null) { %>
                                     <a href="view_resume?email=<%=candidate.getEmail()%>" target="_blank" class="btn-resume">
@@ -331,6 +345,9 @@
                                 <form action="selectCandidate" method="post" class="action-form">
                                     <input type="hidden" name="id" value="<%=appliedVacancy.getId()%>">
                                     <select name="status" class="stage-select">
+                                <form action="selectCandidate" method="post" style="margin:0; display:flex; gap:8px; align-items:center;">
+                                    <input type="hidden" name="id" value="<%=appliedVacancy.getId()%>">
+                                    <select name="status" style="padding:7px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
                                         <option value="Applied" <%= "APPLIED".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Applied</option>
                                         <option value="Written Test" <%= "WRITTEN_TEST".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Written Test</option>
                                         <option value="Interview" <%= "INTERVIEW".equalsIgnoreCase(interviewStage) ? "selected" : "" %>>Interview</option>
