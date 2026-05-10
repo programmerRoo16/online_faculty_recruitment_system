@@ -424,6 +424,15 @@
                 <div style="text-align: right; font-size: 14px;">
                     <strong><%= (recruiter != null) ? recruiter.getEmail() : "" %></strong>
                     <span style="display:block; font-size: 12px;"><%= (recruiter != null) ? recruiter.getRecruiter().toUpperCase() : "" %></span>
+        <div class="top-bar">
+            <div class="user-welcome">
+                <h2>Welcome back, <%= (recruiter != null) ? recruiter.getName() : "Recruiter" %></h2>
+                <p>Manage your institution's recruitment process efficiently.</p>
+            </div>
+            <div class="profile-actions">
+                <div style="text-align: right; font-size: 14px;">
+                    <span style="display:block; font-weight:600;"><%= (recruiter != null) ? recruiter.getEmail() : "" %></span>
+                    <span style="color:var(--secondary-color); font-size: 12px;"><%= (recruiter != null) ? recruiter.getRecruiter().toUpperCase() : "" %></span>
                 </div>
                 <div class="avatar"><%= initials %></div>
             </div>
@@ -478,6 +487,16 @@
                 </button>
             </div>
             <div id="shortlistResult" class="shortlist-result-card">Select a vacancy to preview ranked candidates here.</div>
+        <div class="table-container" style="padding:20px; margin-bottom:20px;">
+            <h3 style="margin-bottom:10px; color:#1E293B;">Smart Shortlisting</h3>
+            <p style="font-size:13px; color:#64748B; margin-bottom:12px;">Enter vacancy ID to generate merit ranking (API score + experience).</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <input id="shortlistVacancyId" type="number" min="1" placeholder="Vacancy ID" style="padding:10px; border:1px solid #cbd5e1; border-radius:8px; min-width:160px;">
+                <button type="button" class="quick-btn" style="border:none; cursor:pointer;" onclick="loadShortlist()">
+                    <i class="fa-solid fa-ranking-star"></i> Generate List
+                </button>
+            </div>
+            <div id="shortlistResult" style="margin-top:12px; font-size:13px; color:#334155;"></div>
         </div>
 
         <script>
@@ -497,6 +516,7 @@
                       return;
                   }
                   var html = '<div>';
+                  var html = '<ol style="padding-left:18px;">';
                   for (var i = 0; i < data.length; i++) {
                       var item = data[i];
                       var name = item.candidate ? (item.candidate.fname + ' ' + item.candidate.lname) : 'Candidate';
@@ -505,6 +525,9 @@
                       html += '<div class="rank-row"><span><strong>#' + (i + 1) + ' ' + name + '</strong><br><small>Stage: ' + stage + '</small></span><span class="rank-score">' + score + '</span></div>';
                   }
                   html += '</div>';
+                      html += '<li><strong>' + name + '</strong> - Score: ' + score + ' - Stage: ' + stage + '</li>';
+                  }
+                  html += '</ol>';
                   result.innerHTML = html;
               })
               .catch(function(){
@@ -551,6 +574,11 @@
                                 <span class="pipeline-chip danger"><i class="fa-solid fa-xmark"></i> Rejected</span>
                             <% } else { %>
                                 <span class="pipeline-chip"><i class="fa-solid fa-spinner"></i> <%=stage.replace("_", " ")%></span>
+                                <span style="color:var(--success); font-weight:600; font-size:12px;"><i class="fa-solid fa-check"></i> <%=stage.replace("_", " ")%></span>
+                            <% } else if("REJECTED".equalsIgnoreCase(stage)) { %>
+                                <span style="color:var(--danger); font-weight:600; font-size:12px;">Rejected</span>
+                            <% } else { %>
+                                <span style="color:var(--warning); font-weight:600; font-size:12px;"><%=stage.replace("_", " ")%></span>
                             <% } %>
                         </td>
                         <td>

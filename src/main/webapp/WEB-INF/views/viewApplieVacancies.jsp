@@ -246,10 +246,18 @@
             <div class="stage-step"><i class="fa-solid fa-user-group"></i> Interview</div>
             <div class="stage-step"><i class="fa-solid fa-handshake"></i> HR Round</div>
             <div class="stage-step"><i class="fa-solid fa-award"></i> Offered</div>
+        
+        <div class="page-header">
+            <div>
+                <h2>My Applications</h2>
+                <p>Track the status of your submitted job applications.</p>
+            </div>
         </div>
 
         <div class="table-container">
             <%
+            List<AppliedVacancy> list = (List<AppliedVacancy>)request.getAttribute("list");
+
             if (list != null && list.size() > 0) {
             %>
             <table>
@@ -270,6 +278,8 @@
                         String status = avacancy.getInterviewStage();
                         String applicationBadgeClass = "badge-pending"; // Default Grey
                         String applicationIconClass = "fa-clock";
+                        String badgeClass = "badge-pending"; // Default Grey
+                        String iconClass = "fa-clock";
                         
                         if(status == null || status.trim().isEmpty()) {
                             status = "APPLIED";
@@ -281,6 +291,11 @@
                         } else if ("REJECTED".equalsIgnoreCase(status)) {
                             applicationBadgeClass = "badge-danger";
                             applicationIconClass = "fa-times-circle";
+                            badgeClass = "badge-success";
+                            iconClass = "fa-check-circle";
+                        } else if ("REJECTED".equalsIgnoreCase(status)) {
+                            badgeClass = "badge-danger";
+                            iconClass = "fa-times-circle";
                         }
                     %>
                     <tr>
@@ -304,6 +319,12 @@
                             </span>
                         </td>
                         <td><span class="score-pill"><%=String.format("%.2f", avacancy.getShortlistScore())%></span></td>
+                            <span class="status-badge <%=badgeClass%>">
+                                <i class="fa-solid <%=iconClass%>"></i> <%=status.replace("_", " ")%>
+                            </span>
+                        </td>
+                        <td><span class="score-pill"><%=String.format("%.2f", avacancy.getShortlistScore())%></span></td>
+                        <td><%=String.format("%.2f", avacancy.getShortlistScore())%></td>
                     </tr> 
                     <%} %>
                 </tbody>
