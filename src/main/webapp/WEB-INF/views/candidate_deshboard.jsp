@@ -347,6 +347,16 @@
     <!-- MAIN CONTENT -->
     <div class="main-content">
         
+        <div class="hero-panel">
+            <div class="user-welcome">
+                <h2>Hello, <%= fullName %>!</h2>
+                <p>Your AI-assisted recruitment workspace is ready. Review resume insights, calculate your API score, track each application stage, and apply for matching faculty vacancies faster.</p>
+            </div>
+            <div class="hero-actions">
+                <a href="seeAllVacancies" class="hero-btn primary"><i class="fa-solid fa-magnifying-glass"></i> Find Jobs</a>
+                <a href="updateProfile" class="hero-btn"><i class="fa-solid fa-file-arrow-up"></i> Update Resume</a>
+                <div class="profile-bubble"><%= initials %></div>
+            </div>
         <div class="top-bar">
             <div class="user-welcome">
                 <h2>Hello, <%= fullName %>!</h2>
@@ -386,6 +396,22 @@
         <div class="section-title">
             <span>AI Profile & API Calculator</span>
         </div>
+        <div class="table-container ai-lab">
+            <div class="insight-grid">
+                <div class="insight-card"><label>Resume Email</label><span><%= candidate != null && candidate.getParsedEmail()!=null ? candidate.getParsedEmail() : "Not extracted" %></span></div>
+                <div class="insight-card"><label>Resume Phone</label><span><%= candidate != null && candidate.getParsedPhone()!=null ? candidate.getParsedPhone() : "Not extracted" %></span></div>
+                <div class="insight-card"><label>Detected Skills</label><span><%= candidate != null && candidate.getParsedSkills()!=null ? candidate.getParsedSkills() : "Upload a readable PDF resume to auto-fill skills" %></span></div>
+                <div class="insight-card"><label>API Score</label><span id="apiScoreValue" class="api-score-number"><%= candidate != null ? candidate.getApiScore() : 0 %></span></div>
+            </div>
+
+            <% if(candidate != null) { %>
+            <form id="apiScoreForm" class="api-form-grid">
+                <input class="api-input" type="number" min="0" name="journalsScopus" placeholder="Scopus Journals">
+                <input class="api-input" type="number" min="0" name="journalsUgc" placeholder="UGC Journals">
+                <input class="api-input" type="number" min="0" name="books" placeholder="Books">
+                <input class="api-input" type="number" min="0" name="conferences" placeholder="Conferences">
+                <input class="api-input" type="number" min="0" name="patents" placeholder="Patents">
+                <button type="submit" class="btn-apply"><i class="fa-solid fa-calculator"></i> Calculate API</button>
         <div class="table-container" style="padding:20px;">
             <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:16px;">
                 <div><strong>Parsed Email:</strong><br><span style="color:#475569;"><%= candidate != null && candidate.getParsedEmail()!=null ? candidate.getParsedEmail() : "Not extracted" %></span></div>
@@ -464,6 +490,11 @@
                         for(int i=0; i<limit; i++) {
                             AppliedVacancy av = appliedList.get(i);
                             String stage = av.getInterviewStage();
+                            String badgeClass = "stage-badge stage-applied";
+                            String label = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
+                            if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-offered"; }
+                            else if("REJECTED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-rejected"; }
+                            else if(!"APPLIED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-progress"; }
                             String badgeClass = "status-pending";
                             String label = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
                             if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { badgeClass = "status-shortlisted"; }
@@ -473,6 +504,7 @@
                         <td style="font-weight: 500;"><%= av.getVacancy().getPost() %></td>
                         <td><%= av.getRecruiter().getName() %></td>
                         <td><%= av.getRecruiter().getEmail() %></td>
+                        <td><span class="<%= badgeClass %>"><i class="fa-solid fa-circle-dot"></i> <%= label %></span></td>
                         <td><span class="status-badge <%= badgeClass %>"><%= label %></span></td>
                         <td><a href="viewApplieVacancies" class="btn-view">View Details</a></td>
                     </tr>

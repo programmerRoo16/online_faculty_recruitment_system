@@ -180,6 +180,29 @@
         }
         .btn-browse:hover { background-color: var(--primary-hover); }
 
+
+        .applications-hero {
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+            color: white;
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: center;
+            box-shadow: 0 16px 36px rgba(15, 118, 110, .22);
+        }
+        .applications-hero h2 { color:white; font-size:28px; margin-bottom:8px; }
+        .applications-hero p { color:#ecfeff; line-height:1.55; }
+        .count-bubble { background:white; color:var(--primary-color); border-radius:18px; padding:16px 22px; text-align:center; min-width:130px; }
+        .count-bubble strong { display:block; font-size:32px; }
+        .stage-guide { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; margin-bottom:20px; }
+        .stage-step { background:white; border:1px solid var(--border-color); border-radius:14px; padding:12px; color:#475569; font-size:12px; font-weight:700; }
+        .stage-step i { color:var(--primary-color); margin-right:6px; }
+        .score-pill { display:inline-flex; min-width:64px; justify-content:center; padding:6px 10px; border-radius:999px; background:#ecfeff; color:#0f766e; font-weight:800; }
+
+
     </style>
 </head>
 <body>
@@ -204,6 +227,25 @@
     </div>
 
     <div class="main-content">
+        <%
+        List<AppliedVacancy> list = (List<AppliedVacancy>)request.getAttribute("list");
+        int applicationCount = (list != null) ? list.size() : 0;
+        %>
+        
+        <div class="applications-hero">
+            <div>
+                <h2>My Applications</h2>
+                <p>Track each faculty application through Applied, Written Test, Interview, HR Round, and Offer stages with recruiter updates in one place.</p>
+            </div>
+            <div class="count-bubble"><strong><%=applicationCount%></strong><span>Applications</span></div>
+        </div>
+
+        <div class="stage-guide">
+            <div class="stage-step"><i class="fa-solid fa-file-circle-check"></i> Applied</div>
+            <div class="stage-step"><i class="fa-solid fa-pen"></i> Written Test</div>
+            <div class="stage-step"><i class="fa-solid fa-user-group"></i> Interview</div>
+            <div class="stage-step"><i class="fa-solid fa-handshake"></i> HR Round</div>
+            <div class="stage-step"><i class="fa-solid fa-award"></i> Offered</div>
         
         <div class="page-header">
             <div>
@@ -269,6 +311,7 @@
                                 <i class="fa-solid <%=iconClass%>"></i> <%=status.replace("_", " ")%>
                             </span>
                         </td>
+                        <td><span class="score-pill"><%=String.format("%.2f", avacancy.getShortlistScore())%></span></td>
                         <td><%=String.format("%.2f", avacancy.getShortlistScore())%></td>
                     </tr> 
                     <%} %>

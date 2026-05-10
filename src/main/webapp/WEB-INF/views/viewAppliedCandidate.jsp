@@ -183,6 +183,28 @@
             font-style: italic;
         }
 
+
+        .review-summary {
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+            color: white;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 22px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            box-shadow: 0 16px 35px rgba(15, 118, 110, .2);
+        }
+        .summary-tile { background: rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.25); border-radius: 14px; padding: 14px; }
+        .summary-tile label { display:block; color:#ccfbf1; font-size:11px; text-transform:uppercase; font-weight:800; margin-bottom:6px; }
+        .summary-tile strong { font-size:26px; }
+        .score-pill { display:inline-flex; align-items:center; justify-content:center; min-width:58px; padding:6px 10px; border-radius:999px; background:#ecfeff; color:#0f766e; font-weight:800; }
+        .skills-text { max-width: 220px; line-height:1.45; color:#475569; font-size:12px; }
+        .stage-pill { padding:6px 10px; border-radius:999px; background:#e0f2fe; color:#075985; font-weight:800; font-size:11px; display:inline-flex; gap:5px; align-items:center; }
+        .stage-select { padding:9px; border:1px solid #cbd5e1; border-radius:10px; font-size:12px; background:white; min-width:135px; }
+        .action-form { margin:0; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+
     </style>
 </head>
 <body>
@@ -209,6 +231,34 @@
 
     <div class="main-content">
         
+        <%
+            @SuppressWarnings("unchecked")
+            List<AppliedVacancy> list = (List<AppliedVacancy>)request.getAttribute("list");
+            int totalApplicants = (list != null) ? list.size() : 0;
+            int offeredApplicants = 0;
+            int activeApplicants = 0;
+            if(list != null) {
+                for(int idx=0; idx<list.size(); idx++) {
+                    AppliedVacancy row = list.get(idx);
+                    String rowStage = row.getInterviewStage();
+                    if("OFFERED".equalsIgnoreCase(rowStage)) { offeredApplicants++; }
+                    if(rowStage == null || !"REJECTED".equalsIgnoreCase(rowStage)) { activeApplicants++; }
+                }
+            }
+        %>
+
+        <div class="page-header">
+            <div>
+                <h2>Manage Applicants</h2>
+                <p>Compare API scores, resume-extracted skills, and move candidates through the interview pipeline.</p>
+            </div>
+        </div>
+
+        <div class="review-summary">
+            <div class="summary-tile"><label>Total Applicants</label><strong><%=totalApplicants%></strong></div>
+            <div class="summary-tile"><label>Active Pipeline</label><strong><%=activeApplicants%></strong></div>
+            <div class="summary-tile"><label>Offered</label><strong><%=offeredApplicants%></strong></div>
+        </div>
         <div class="page-header">
             <div>
                 <h2>Manage Applicants</h2>
@@ -268,6 +318,8 @@
                             </td>
                             <td><%=candidate.getQualification()%></td>
                             <td><%=candidate.getExperience()%></td>
+                            <td><span class="score-pill"><%=candidate.getApiScore()%></span></td>
+                            <td><div class="skills-text"><%=candidate.getParsedSkills() == null ? "N/A" : candidate.getParsedSkills()%></div></td>
                             <td><%=candidate.getApiScore()%></td>
                             <td><%=candidate.getParsedSkills() == null ? "N/A" : candidate.getParsedSkills()%></td>
                             <td>
@@ -277,6 +329,7 @@
                                 </div>
                             </td>
                             <td><%=candidate.getAddress()%></td>
+                            <td><span class="stage-pill"><i class="fa-solid fa-route"></i> <%=interviewStage.replace("_", " ")%></span></td>
                             <td><span class="user-meta" style="font-weight:600;"><%=interviewStage.replace("_", " ")%></span></td>
                             <td>
                                 <% if(candidate.getFileData() != null) { %>
@@ -289,6 +342,9 @@
                             </td>
                             
                             <td>
+                                <form action="selectCandidate" method="post" class="action-form">
+                                    <input type="hidden" name="id" value="<%=appliedVacancy.getId()%>">
+                                    <select name="status" class="stage-select">
                                 <form action="selectCandidate" method="post" style="margin:0; display:flex; gap:8px; align-items:center;">
                                     <input type="hidden" name="id" value="<%=appliedVacancy.getId()%>">
                                     <select name="status" style="padding:7px; border:1px solid #cbd5e1; border-radius:6px; font-size:12px;">
