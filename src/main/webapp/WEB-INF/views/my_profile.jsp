@@ -124,7 +124,6 @@
                     <input type="hidden" name="fname" value="<%=candidate.getFname()%>">
                     <input type="hidden" name="lname" value="<%=candidate.getLname()%>">
                     <input type="hidden" name="verifie" value="<%=candidate.isVerified()%>">
-                    <input type="hidden" name="verifie" value="<%=candidate.isVerified()%>">
                                         
                     <div class="form-group" style="text-align: left;">
                         <label>Location</label>
@@ -157,7 +156,7 @@
     <div class="card-body">
         
         <div class="upload-zone" id="dropZone">
-            <input type="file" id="resumeInput" name="resume" value="<%=candidate.getFileData()%> %>" accept=".pdf,.docx">
+            <input type="file" id="resumeInput" name="resume" accept=".pdf,.docx">
             
             <i class="fa-solid fa-cloud-arrow-up file-icon"></i>
             <p style="font-size: 13px; color: var(--text-dark); font-weight: 500; margin: 0;">

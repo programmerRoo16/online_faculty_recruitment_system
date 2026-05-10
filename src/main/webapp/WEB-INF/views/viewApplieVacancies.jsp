@@ -276,6 +276,8 @@
                         
                         // --- Logic for Badge Colors ---
                         String status = avacancy.getInterviewStage();
+                        String applicationBadgeClass = "badge-pending"; // Default Grey
+                        String applicationIconClass = "fa-clock";
                         String badgeClass = "badge-pending"; // Default Grey
                         String iconClass = "fa-clock";
                         
@@ -284,6 +286,11 @@
                         }
                         
                         if("OFFERED".equalsIgnoreCase(status) || "SHORTLISTED".equalsIgnoreCase(status)) {
+                            applicationBadgeClass = "badge-success";
+                            applicationIconClass = "fa-check-circle";
+                        } else if ("REJECTED".equalsIgnoreCase(status)) {
+                            applicationBadgeClass = "badge-danger";
+                            applicationIconClass = "fa-times-circle";
                             badgeClass = "badge-success";
                             iconClass = "fa-check-circle";
                         } else if ("REJECTED".equalsIgnoreCase(status)) {
@@ -307,6 +314,11 @@
                             </div>
                         </td>
                         <td>
+                            <span class="status-badge <%=applicationBadgeClass%>">
+                                <i class="fa-solid <%=applicationIconClass%>"></i> <%=status.replace("_", " ")%>
+                            </span>
+                        </td>
+                        <td><span class="score-pill"><%=String.format("%.2f", avacancy.getShortlistScore())%></span></td>
                             <span class="status-badge <%=badgeClass%>">
                                 <i class="fa-solid <%=iconClass%>"></i> <%=status.replace("_", " ")%>
                             </span>

@@ -490,6 +490,11 @@
                         for(int i=0; i<limit; i++) {
                             AppliedVacancy av = appliedList.get(i);
                             String stage = av.getInterviewStage();
+                            String applicationStageBadgeClass = "stage-badge stage-applied";
+                            String applicationStageLabel = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
+                            if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { applicationStageBadgeClass = "stage-badge stage-offered"; }
+                            else if("REJECTED".equalsIgnoreCase(stage)) { applicationStageBadgeClass = "stage-badge stage-rejected"; }
+                            else if(!"APPLIED".equalsIgnoreCase(stage)) { applicationStageBadgeClass = "stage-badge stage-progress"; }
                             String badgeClass = "stage-badge stage-applied";
                             String label = (stage == null || stage.trim().isEmpty()) ? "Applied" : stage.replace("_", " ");
                             if("OFFERED".equalsIgnoreCase(stage) || "SHORTLISTED".equalsIgnoreCase(stage)) { badgeClass = "stage-badge stage-offered"; }
@@ -504,6 +509,7 @@
                         <td style="font-weight: 500;"><%= av.getVacancy().getPost() %></td>
                         <td><%= av.getRecruiter().getName() %></td>
                         <td><%= av.getRecruiter().getEmail() %></td>
+                        <td><span class="<%= applicationStageBadgeClass %>"><i class="fa-solid fa-circle-dot"></i> <%= applicationStageLabel %></span></td>
                         <td><span class="<%= badgeClass %>"><i class="fa-solid fa-circle-dot"></i> <%= label %></span></td>
                         <td><span class="status-badge <%= badgeClass %>"><%= label %></span></td>
                         <td><a href="viewApplieVacancies" class="btn-view">View Details</a></td>
